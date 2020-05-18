@@ -16,7 +16,6 @@ function Main() {
     const handleDate = async (date) => {
         setDate(date);
         getDateWork(date);
-
     }
     const getDateWork = async (date) =>{
         try {

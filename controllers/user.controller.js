@@ -33,7 +33,9 @@ module.exports.list = async (req, res) => {
 }
 module.exports.update = async (req, res) => {
     const userId = req.body.userId;
-    //const userData = req.body.user;
+    // const dob = req.body.dob;
+    // const email = req.body.email;
+    // const phone = req.body.phone;
     let image = '';
     var storage = multer.diskStorage({});
     var upload = multer({ storage: storage }).single('image');
@@ -59,7 +61,7 @@ module.exports.history = async (req, res) => {
     const works = await Work.find();
     let work = {};
     for (let i in works){
-        if (moment(works[i].date).format("MMM Do YY") === moment(date).format("MMM Do YY")) {
+        if (moment(new Date(works[i].date)).format("MMM Do YY") === moment(new Date(date)).format("MMM Do YY")) {
             work = works[i];
             break;
         }

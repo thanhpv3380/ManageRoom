@@ -9,8 +9,10 @@ function ContentLeft(props) {
     const [currentUser, setCurrentUser] = useState({});
     const handleConfirm = async (e) => {
         e.preventDefault();
-        const today = new Date();
-        if (moment(props.date).format("MMM Do YY") === moment(today).format("MMM Do YY")){
+        const today = moment(new Date()).format("MMM Do YY");;
+        const date = moment(new Date(props.date)).format("MMM Do YY");
+        
+        if (date === today){
             try {
                 let config = {
                     headers: {
