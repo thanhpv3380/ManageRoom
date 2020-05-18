@@ -1,0 +1,53 @@
+.tab{
+    padding: 2rem;
+}
+.tab ul li{
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+}
+.tab ul li .user-title{
+    width: 100px;
+    font-weight: 700;
+    vertical-align: middle;
+}
+.tab .tab-user-img{
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+}
+.mb-15{
+    margin-bottom: 15px;
+}
+.tab-pass{
+    padding: 3rem;
+}
+.tab-pass ul li .user-title{
+    width: 200px;
+}
+.tab-title{
+    font-size: 2vw;
+    margin-bottom: 2rem;
+    font-weight: 800;
+}
+.tab-btn{
+    display: block;
+    padding: 12px 20px;
+    float: right;
+
+}
+@media only screen and (max-width: 500px) {
+    .tab{
+        padding: 1rem;
+    }
+    .tab-title{
+        font-size: 6vw;
+        margin-bottom: 2rem;
+    }
+    .tab ul li{
+        display: block;
+    }
+    .tab-btn{
+        width: 100%;
+    }
+}
