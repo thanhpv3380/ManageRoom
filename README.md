@@ -1,6 +1,6 @@
 # ManageRoom
 ManageRoom help manage members, notify by email in the room
-## Use the package manager (npm)[https://www.npmjs.com/] to install 
+## Use the package manager [npm](https://www.npmjs.com/) to install 
 ```bash
 1. npm install
 2. cd client
@@ -15,5 +15,5 @@ npm install
 ## Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
 Please make sure to update tests as appropriate.
-##Hashtag
+## Hashtag
 [Henry](https://www.facebook.com/chimsedimua99/)
