@@ -1,5 +1,5 @@
 # ManageRoom
-ManageRoom help manage members, notify by email in the room
+A ReactJs, NodeJs App
 ## Use the package manager [npm](https://www.npmjs.com/) to install 
 ```bash
 1. npm install
