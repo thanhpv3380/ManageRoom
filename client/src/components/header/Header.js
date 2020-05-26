@@ -24,15 +24,20 @@ import Logo from './../../images/logo.png';
 function Header() {
     let history = useHistory();
     const [show, setShow] = useState(false);
-    
+
     const [user, setUser] = useState({});
     const [file, setFile] = useState();
+
+    const [dob, setDob] = useState('');
+    const [email, setEmail] = useState('');
+    const [phone, setPhone] = useState('');
+
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
 
     useEffect(() => {
         async function getDataUser() {
-            
+
             try {
                 let config = {
                     headers: {
@@ -41,10 +46,12 @@ function Header() {
                 }
                 const res = await axios.get(`${types.URL}/users`, config);
                 //console.log("fds");
-                if (res.data.success){
+                if (res.data.success) {
                     setUser(res.data.user);
-                    //console.log(res.data.user);
-                } 
+                    setDob(res.data.user.dob);
+                    setEmail(res.data.user.email);
+                    setPhone(res.data.user.phone);
+                }
             } catch (error) {
                 console.log(error);
             }
@@ -55,8 +62,6 @@ function Header() {
         e.preventDefault();
         const formData = new FormData();
         formData.append('image', file);
-        formData.append('user', user);
-        //console.log(formData);
         const config = {
             headers: {
                 'Authorization': localStorage.getItem('user'),
@@ -65,19 +70,22 @@ function Header() {
         };
         try {
             const res = await axios.post(`${types.URL}/users/update`, formData, config);
-            if (res.data.success){
+            if (res.data.success) {
                 setUser(res.data.user);
+                setDob(res.data.user.dob);
+                setEmail(res.data.user.email);
+                setPhone(res.data.user.phone);
                 handleClose();
             }
-        } catch (err){
+        } catch (err) {
             console.log(err);
         }
-         
+
     }
-    const handleLogout = () =>{
+    const handleLogout = () => {
         localStorage.removeItem('user');
         history.push('/');
-    } 
+    }
     return (
         <nav className="navbar navbar-expand-lg navbar-light bg-light shadow p-3 mb-5 bg-white rounded">
             <Link className="navbar-brand mr-3" to="/home">
@@ -102,7 +110,7 @@ function Header() {
                             {user.name}
                         </Dropdown.Toggle>
                         <Dropdown.Menu>
-                            <Dropdown.Item href="" onClick={handleShow}>Imformation</Dropdown.Item>
+                            <Dropdown.Item href="" onClick={handleShow}>Information</Dropdown.Item>
                             <Dropdown.Item href="" onClick={handleLogout}>Logout</Dropdown.Item>
                         </Dropdown.Menu>
                     </Dropdown>
@@ -116,10 +124,10 @@ function Header() {
                     <div className="container tab">
                         <div className="user-img text-center mb-5">
                             <img src={user.image} className="tab-user-img mb-15" alt="avatar" />
-                            <input type="file" 
+                            <input type="file"
                                 name="image"
-                                onChange={(e) => setFile(e.target.files[0])} 
-                                className="form-control-file border w-50 m-auto " 
+                                onChange={(e) => setFile(e.target.files[0])}
+                                className="form-control-file border w-50 m-auto "
                             />
                         </div>
                         <ul>
@@ -152,9 +160,9 @@ function Header() {
                                     className="form-control"
                                     name="dob"
                                     placeholder="MM/DD/YYYY"
-                                    value={moment(user.dob).format("DD/MM/YYYY")}  
-                                    onChange={e => setUser({...user, dob: e.target.value})}
-                                    // disabled
+                                    value={moment(new Date(user.dob)).format("DD/MM/YYYY")}
+                                    // onChange={e => setDob(e.target.value)}
+                                    disabled
                                 />
                             </li>
                             <li>
@@ -164,8 +172,8 @@ function Header() {
                                     className="form-control"
                                     name="email"
                                     value={user.email}
-                                    onChange={e => setUser({...user, email: e.target.value})}
-                                    // disabled
+                                    // onChange={e => setEmail(e.target.value)}
+                                    disabled
                                 />
                             </li>
                             <li>
@@ -175,11 +183,11 @@ function Header() {
                                     className="form-control"
                                     name="phone"
                                     value={user.phone}
-                                    onChange={e => setUser({...user, phone: e.target.value})}
-                                    // disabled
+                                    // onChange={e => setPhone(e.target.value)}
+                                    disabled
                                 />
                             </li>
-                            
+
                         </ul>
                     </div>
                 </Modal.Body>

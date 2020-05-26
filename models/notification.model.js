@@ -9,6 +9,10 @@ const notificationSchema = new mongoose.Schema({
         type: Date,
         require: false
     },
+    title: {
+        type: String,
+        required: false
+    },
     content: {
         type: String,
         required: false

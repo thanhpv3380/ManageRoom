@@ -23,7 +23,7 @@ app.use(cors());
 app.use(cookieParser("secret"));
 
 // connection db
-mongoose.connect(process.env.MONGO_URL, { useNewUrlParser: true }).then(db => console.log('DB is Connected'));
+mongoose.connect(process.env.MONGO_URL, { useUnifiedTopology: true, useNewUrlParser: true, useCreateIndex: true}).then(db => console.log('DB is Connected'));
 
 app.get('/', async (req, res) => {
 
@@ -49,7 +49,7 @@ const notifiEmail = async () => {
         const today = new Date();
         let check = true;
         for (let work of works){
-            if (moment(work.date).format("MMM Do YY") === moment(today).format("MMM Do YY")){
+            if (moment(new Date(work.date)).format("MMM Do YY") === moment(today).format("MMM Do YY")){
                 check = false;
             }
         }
