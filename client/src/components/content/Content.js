@@ -4,6 +4,7 @@ import React from 'react';
 import Header from './../header/Header';
 import Main from './main/Main';
 import Notification from './notification/Notification';
+import BetGame from './betgame/BetGame';
 
 import {
     BrowserRouter as Router,
@@ -20,6 +21,7 @@ function Content() {
                 <Switch>
                     <Route exact path={match.path} > <Main /></Route>
                     <Route exact path={`${match.path}/notification`} > <Notification/></Route>
+                    <Route exact path={`${match.path}/betgame`} > <BetGame/></Route>
                 </Switch>
             </div>
         </div>
