@@ -27,6 +27,10 @@ const userSchema = new mongoose.Schema({
     dob: {
         type: Date,
         required: false
+    },
+    coin: {
+        type: Number,
+        required: false
     }
 });
 const User = mongoose.model('users', userSchema);

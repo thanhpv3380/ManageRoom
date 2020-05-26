@@ -9,10 +9,10 @@ const sendMail = require('./handlers/sendMail');
 const cors = require('cors');
 
 const app = express();
+const server = require('http').Server(app);
+const io = require('socket.io')(server);
 
 const port = process.env.PORT || 9000;
-
-
 
 //config env
 require('dotenv').config();
@@ -43,48 +43,136 @@ app.use('/users', authMiddleware.auth, userRoute);
 
 const User = require('./models/users.model');
 const Work = require('./models/works.model');
-const notifiEmail = async () => {
-    var j = schedule.scheduleJob('0 0 20 * * *', async function() {
-        const works = await Work.find();
-        const today = new Date();
-        let check = true;
-        for (let work of works){
-            if (moment(new Date(work.date)).format("MMM Do YY") === moment(today).format("MMM Do YY")){
-                check = false;
+
+// const notifiEmail = async () => {
+//     var j = schedule.scheduleJob('0 0 20 * * *', async function() {
+//         const works = await Work.find();
+//         const today = new Date();
+//         let check = true;
+//         for (let work of works){
+//             if (moment(new Date(work.date)).format("MMM Do YY") === moment(today).format("MMM Do YY")){
+//                 check = false;
+//             }
+//         }
+//         //console.log(check);
+//         if (check){
+//             const users = await User.find();
+//             for (let user of users) {
+//                 if (user.email) {
+//                     sendMail(user.email, '[Thông báo phòng 104]', '<strong>Test</strong>');
+//                 }
+//             }
+//         }
+//     });
+// }
+// notifiEmail();
+
+function randomPos(choice){
+    let minX = 0;
+    let minY = 0;
+    if (choice > 3){
+        minX = (choice-4)*250;
+        minY = 250;
+    } else {
+        minX = (choice-1)*250;
+        minY = 0;
+    }
+    let x = Math.floor(Math.random() * 150) + (minX);
+    let y = Math.floor(Math.random() * 150) + (minY);
+    let rad = Math.floor(Math.random() * 360);
+    return {x, y, rad};
+}
+let bets = [];
+let players = [];
+// {userId, coins, }
+io.on('connection', (socket) => {
+    console.log('connection ' + socket.id);
+    socket.on('client-send-info', async (data) =>{
+        socket.userId = data.userId;
+        const user = await User.findOne({_id: data.userId});        
+        players.push(
+            {
+                user: user,
+                coin: user.coin
             }
-        }
-        //console.log(check);
-        if (check){
-            const users = await User.find();
-            for (let user of users) {
-                if (user.email) {
-                    sendMail(user.email, '[Thông báo phòng 104]', '<strong>Test</strong>');
-                }
+        );
+        socket.emit('client-send-allbets', {bets, players});
+    });
+    socket.on('client-send-bet', async (data) =>{
+        const choice = data.choice;
+        const user = await User.findOne({_id: data.userId});
+        //console.log(user);
+        if (user){
+            let posBet = randomPos(choice);
+            res = {
+                user,
+                choice,
+                posBet
             }
+            bets.push(res);
+            io.sockets.emit('server-send-bet', res);
         }
     });
-}
-notifiEmail();
 
+    socket.on('client-send-roll', () =>{
+        let one = Math.floor(Math.random() * 6);
+        let two = Math.floor(Math.random() * 6);
+        let three = Math.floor(Math.random() * 6);
+        console.log(one, two, three);
+        for (let bet of bets){
+            let point = 0;
+            const user = bet.user;
+            const userId = user._id;
+            //console.log("choice: ",bet.choice);
+            if (bet.choice === one+1) point++;
+            if (bet.choice === two+1) point++;
+            if (bet.choice === three+1) point++;
+            //console.log(point);
+            for (let i in players){
+                let id = players[i].user._id;
+                if (JSON.stringify(id) == JSON.stringify(userId)){
+                    //console.log(id);
+                    let coin = players[i].coin;
+                    //console.log(coin);
+                    coin -= 5;
+                    coin += point * 10;
+                    //console.log(coin);
+                    players[i] = {...players[i], coin};
+                    break;
+                } 
+            }    
+        }
+        console.log(players);
+        bets = [];
+        io.sockets.emit('server-send-roll', {one, two, three, players});
+    });
+    socket.on('client-send-open', () =>{
+        io.sockets.emit('server-send-open');
+    });
+    socket.on('client-send-close', () =>{
+        io.sockets.emit('server-send-close');
+    });
+    socket.on('disconnect', async () => {
+        console.log('disconnect ' + socket.id);
+        for (let i in players){
+            if (JSON.stringify(players[i].user._id) == JSON.stringify(socket.userId)){
+                let coin = players[i].coin;
+                if (players[i].coin >= 999999) coin = 999999;
+                const rs = await User.updateOne({_id: socket.userId}, {coin});
+                
+                players.splice(i, 1);
 
-// const User = require('./models/users.model');
-// const addUser = async () =>{
-//     const name = ['Nguyễn Văn Đức', 'Đoàn Trọng Nghĩa',  'Vũ Ngọc Trường', 'Phạm Văn Thao', 'Nguyễn Văn Cường', 'Lê Bình Minh',  'Vũ Đức Long', 'Tạ Văn Đức', 'Phạm Huy Duy', 'Phạm Xuân Điều'];
-//     const address = ['Quảng Xương - Thanh Hóa', 'Tiên Lữ - Hưng Yên', 'Hàn Thuyên - Bắc Ninh', 'Lương Sơn Bạc - Hòa Bình', 'Ninh Hòa - Khánh Hòa', 'Lê Trân - Hải Phòng', 'TP Thanh Hóa', 'Hà Nội', 'Đông Hưng - Thái Bình', 'An Lão - Hải Phòng'];
-//     //const password = [];
-//     for (let i = 0; i < 10; i++){
-//         const user = {
-//             name : name[i],
-//             email : 'test@gmail.com',
-//             password : '2017xxxx',
-//             phone : 'xxxxx',
-//             address : address[i],
-//             image : 'https://res.cloudinary.com/dfbongzx0/image/upload/v1587393070/17241-200_sjxojm.png',
-//             dob : '12/11/1999'
-//         }
-//         console.log(user);
-//         const rs =  await User.create(user);
-//     }
-// } 
-// addUser();
-app.listen(port, () => console.log('Server start at port 3000'));
+                break;
+            }
+        }
+        console.log(players);
+
+        socket.emit('server-send-disconnect', {players});
+    });
+
+});
+// async function test(){
+//     const rs = await User.updateMany({}, {coin: 100});
+// }
+// test();
+server.listen(port, () => console.log('Server start at port 3000'));

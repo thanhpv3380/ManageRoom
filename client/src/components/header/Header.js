@@ -102,6 +102,9 @@ function Header() {
                     <li className="nav-item active">
                         <Link className="nav-link" to="/home/notification">Thông báo</Link>
                     </li>
+                    <li className="nav-item active">
+                        <Link className="nav-link" to="/home/betgame">Bầu cua</Link>
+                    </li>
                 </ul>
                 <div className="d-flex align-items-center">
                     <Dropdown>
